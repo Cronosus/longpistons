@@ -1,0 +1,9 @@
+{
+  "parent": "longpistons:block/piston_arm_model",
+  "textures": {
+    "all": "longpistons:block/piston_arm_texture",
+    "particle": "longpistons:block/piston_arm_texture",
+    "5": "longpistons:block/piston_arm_texture"
+  },
+  "render_type": "solid"
+}

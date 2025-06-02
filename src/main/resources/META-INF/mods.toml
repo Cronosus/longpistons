@@ -1,0 +1,18 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="longpistons"
+version="1.0.0"
+displayName="Long Pistons"
+description='''
+Adds pistons that push (and pull) blocks more blocks away.
+'''
+
+[[dependencies.longpistons]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"

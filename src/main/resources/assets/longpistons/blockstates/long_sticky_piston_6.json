@@ -1,0 +1,50 @@
+{
+  "variants": {
+    "extended=false,facing=down": {
+      "model": "longpistons:block/long_sticky_piston_6",
+      "x": 90
+    },
+    "extended=false,facing=east": {
+      "model": "longpistons:block/long_sticky_piston_6",
+      "y": 90
+    },
+    "extended=false,facing=north": {
+      "model": "longpistons:block/long_sticky_piston_6"
+    },
+    "extended=false,facing=south": {
+      "model": "longpistons:block/long_sticky_piston_6",
+      "y": 180
+    },
+    "extended=false,facing=up": {
+      "model": "longpistons:block/long_sticky_piston_6",
+      "x": 270
+    },
+    "extended=false,facing=west": {
+      "model": "longpistons:block/long_sticky_piston_6",
+      "y": 270
+    },
+    "extended=true,facing=down": {
+      "model": "longpistons:block/long_piston_base_6",
+      "x": 90
+    },
+    "extended=true,facing=east": {
+      "model": "longpistons:block/long_piston_base_6",
+      "y": 90
+    },
+    "extended=true,facing=north": {
+      "model": "longpistons:block/long_piston_base_6"
+    },
+    "extended=true,facing=south": {
+      "model": "longpistons:block/long_piston_base_6",
+      "y": 180
+    },
+    "extended=true,facing=up": {
+      "model": "longpistons:block/long_piston_base_6",
+      "x": 270
+    },
+    "extended=true,facing=west": {
+      "model": "longpistons:block/long_piston_base_6",
+      "y": 270
+    }
+  }
+}
