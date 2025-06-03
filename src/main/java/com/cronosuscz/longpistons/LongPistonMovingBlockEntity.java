@@ -39,6 +39,7 @@ public class LongPistonMovingBlockEntity extends BlockEntity {
         if (be.ticks >= be.maxTicks) {
             if (be.extending) {
                 level.setBlockAndUpdate(pos, be.movedState);
+                level.removeBlockEntity(pos);
             } else {
                 level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                 level.removeBlockEntity(pos);

@@ -35,7 +35,7 @@ public class LongPistonMovingBlockRenderer implements BlockEntityRenderer<LongPi
         Direction dir = be.direction;
         float offset = (be.isExtending() ? progress : 1.0f - progress);
 
-        // Translate to where the head (moved block) should be
+        // where the head (moved block) should be
         poseStack.pushPose();
         poseStack.translate(
             dir.getStepX() * offset,
