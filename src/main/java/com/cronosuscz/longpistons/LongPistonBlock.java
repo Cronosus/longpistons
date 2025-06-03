@@ -102,25 +102,6 @@ public class LongPistonBlock extends Block implements EntityBlock {
         }
     }
     
-    private List<BlockPos> collectMovableBlocks(Level level, BlockPos pistonPos, Direction dir) {
-        List<BlockPos> blocksToMove = new ArrayList<>();
-        for (int i = 1; i <= extensionLength; i++) {
-            BlockPos checkPos = pistonPos.relative(dir, i);
-            BlockState targetState = level.getBlockState(checkPos);
-
-            if (targetState.isAir()) continue;
-
-            PushReaction reaction = targetState.getPistonPushReaction();
-            if (reaction != PushReaction.NORMAL && reaction != PushReaction.PUSH_ONLY) {
-                return Collections.emptyList(); // Abort if we hit an immovable block
-            }
-
-            blocksToMove.add(checkPos);
-
-            if (blocksToMove.size() > 12) return Collections.emptyList(); // Vanilla limit
-        }
-        return blocksToMove;
-    }
 /*
     private void moveBlocks(Level level, List<BlockPos> blocksToMove, Direction dir, BlockPos pistonBase, boolean extending) {
         if (extending) {
@@ -297,7 +278,7 @@ private boolean tryExtend(Level level, BlockPos pos, Direction dir) {
     List<BlockPos> blocksToMove = LongPistonResolver.resolvePush(level, pos, dir, extensionLength);
 
     // Allow extension even when no blocks are pushed
-    if (!blocksToMove.isEmpty()) {
+    if (blocksToMove != null && !blocksToMove.isEmpty()) {
         moveBlocks(level, blocksToMove, dir, pos, true);
     }
 
@@ -313,6 +294,7 @@ for (int i = blocksToMove.size() - 1; i >= 0; i--) {
     BlockPos toPos = fromPos.relative(dir);
 
     // Replace with moving block
+    level.setBlock(toPos, LongPistons.LONG_MOVING_PISTON.get().defaultBlockState(), 66);
     BlockEntity be = LongPistonMovingBlockEntity.newMovingBlockEntity(
     toPos, moveState, dir, true, false, 0, this.isSticky
     );

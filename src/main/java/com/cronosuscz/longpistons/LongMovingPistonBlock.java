@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
+import com.cronosuscz.longpistons.LongPistons;
 
 public class LongMovingPistonBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
@@ -43,11 +44,22 @@ public class LongMovingPistonBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide) {
-            return (lvl, pos, blockState, blockEntity) ->
-                LongPistonMovingBlockEntity.clientTick(lvl, pos, blockState, (LongPistonMovingBlockEntity) blockEntity);
+        if (type != LongPistons.LONG_PISTON_MOVING_BLOCK_ENTITY.get()) {
+            return null;
         }
-        return null;
+        if (!level.isClientSide) {
+            return (lvl, pos, st, be) -> {
+                if (be instanceof LongPistonMovingBlockEntity movingBlock) {
+                    LongPistonMovingBlockEntity.serverTick(lvl, pos, st, movingBlock);
+                }
+            };
+        } else {
+            return (lvl, pos, st, be) -> {
+                if (be instanceof LongPistonMovingBlockEntity movingBlock) {
+                    LongPistonMovingBlockEntity.clientTick(lvl, pos, st, movingBlock);
+                }
+            };
+        }
     }
 
     @Override

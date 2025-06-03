@@ -69,7 +69,7 @@ public class PistonArmBlock extends Block {
 
         return buffer[1];
     }
-/*
+/*      //nefunguje spravne
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         super.onRemove(state, level, pos, newState, isMoving);

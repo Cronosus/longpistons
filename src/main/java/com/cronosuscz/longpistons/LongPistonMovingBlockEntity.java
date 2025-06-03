@@ -28,12 +28,6 @@ public class LongPistonMovingBlockEntity extends BlockEntity {
         this.maxTicks = 10; // Duration of animation in ticks
     }
 
-    public void setup(BlockState movedState, Direction dir, boolean extending) {
-        this.movedState = movedState;
-        this.direction = dir;
-        this.extending = extending;
-    }
-
     public static void clientTick(Level level, BlockPos pos, BlockState state, LongPistonMovingBlockEntity be) {
         be.ticks++;
         if (be.ticks >= be.maxTicks) {
@@ -47,6 +41,14 @@ public class LongPistonMovingBlockEntity extends BlockEntity {
         } else {
             level.sendBlockUpdated(pos, state, state, 0);
         }    
+    }
+
+    public static void serverTick(Level level, BlockPos pos, BlockState state, LongPistonMovingBlockEntity be) {
+        be.ticks++;
+        if (be.ticks >= be.maxTicks) {
+            level.setBlockAndUpdate(pos, be.extending ? be.movedState : Blocks.AIR.defaultBlockState());
+            level.removeBlockEntity(pos);
+        }
     }
 
     public float getProgress(float partialTicks) {
@@ -74,6 +76,7 @@ public class LongPistonMovingBlockEntity extends BlockEntity {
         tag.putInt("ticks", ticks);
         tag.putBoolean("extending", extending);
         tag.putString("direction", direction.getName());
+        tag.putBoolean("sticky", isSticky);
     }
 
     @Override
@@ -83,5 +86,6 @@ public class LongPistonMovingBlockEntity extends BlockEntity {
         this.ticks = tag.getInt("ticks");
         this.extending = tag.getBoolean("extending");
         this.direction = Direction.byName(tag.getString("direction"));
+        this.isSticky = tag.getBoolean("sticky");
     }
 }
