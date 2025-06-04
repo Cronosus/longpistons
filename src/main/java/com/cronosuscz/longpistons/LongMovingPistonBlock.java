@@ -38,7 +38,8 @@ public class LongMovingPistonBlock extends Block implements EntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new LongPistonMovingBlockEntity(pos, state);
+        //return new LongPistonMovingBlockEntity(pos, state);
+        return null;
     }
 
     @Nullable

@@ -66,6 +66,7 @@ public class LongPistonMovingBlockRenderer implements BlockEntityRenderer<LongPi
 
             dispatcher.renderSingleBlock(armState, poseStack, buffer, combinedLight, combinedOverlay);
             poseStack.popPose();
+            poseStack.popPose();
         }
     }
 }

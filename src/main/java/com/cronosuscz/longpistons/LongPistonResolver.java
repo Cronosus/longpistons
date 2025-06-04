@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.PushReaction;
 import com.cronosuscz.longpistons.LongPistons;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -20,42 +21,45 @@ public class LongPistonResolver {
     public static final int MAX_PUSH_LIMIT = 12;
     public static final Set<Block> BLOCK_PUSH_BLACKLIST = Set.of(Blocks.BEDROCK, Blocks.OBSIDIAN, Blocks.RESPAWN_ANCHOR, Blocks.REINFORCED_DEEPSLATE, Blocks.END_PORTAL_FRAME);
 
- public static List<BlockPos> resolvePush(Level level, BlockPos pistonPos, Direction dir, int extensionLength) {
-    List<BlockPos> allInLine = new ArrayList<>();
-    int airSlots = 0;
+public static List<BlockPos> resolvePush(Level level, BlockPos pistonPos, Direction dir, int extensionLength) {
+    List<BlockPos> blocksToMove = new ArrayList<>();
+    List<BlockPos> airSlots = new ArrayList<>();
 
-    int totalCheckRange = extensionLength + 12; // check full extension + max vanilla push
-
-    for (int i = 1; i <= totalCheckRange; i++) {
+    // First, collect the blocks in front of the piston up to the piston head
+    for (int i = 1; i <= extensionLength; i++) {
         BlockPos currentPos = pistonPos.relative(dir, i);
         BlockState state = level.getBlockState(currentPos);
         Block block = state.getBlock();
 
-        // Stop at unpushable block (don't include it)
+        if (state.isAir()) continue;
+
         if (BLOCK_PUSH_BLACKLIST.contains(block)
+                || block == LongPistons.PISTON_ARM.get()
                 || state.getPistonPushReaction() == PushReaction.BLOCK
                 || !state.canSurvive(level, currentPos)) {
-            break;
+            return List.of(); // Unpushable in path
         }
 
-        allInLine.add(currentPos);
+        blocksToMove.add(currentPos);
+    }
 
-        if (state.isAir()) {
-            airSlots++;
+    // Then, collect the space into which those blocks will move
+    for (int i = extensionLength + 1; i <= extensionLength + MAX_PUSH_LIMIT; i++) {
+        BlockPos targetPos = pistonPos.relative(dir, i);
+        if (level.getBlockState(targetPos).isAir()) {
+            airSlots.add(targetPos);
+        } else {
+            break; // Stop if we hit a non-air block
         }
     }
 
-    // Determine how many blocks we can push (up to 12)
-    int maxMovable = Math.min(airSlots, MAX_PUSH_LIMIT);
+    // If not enough space or too many blocks, cancel
+    if (blocksToMove.size() > MAX_PUSH_LIMIT || blocksToMove.size() > airSlots.size()) {
+        return null;
+    }
 
-    // Filter only pushable, non-air blocks (respect order)
-    List<BlockPos> blocksToMove = allInLine.stream()
-        .filter(pos -> !level.getBlockState(pos).isAir())
-        .limit(maxMovable)
-        .collect(Collectors.toList());
-
-    System.out.println("Air slots: " + airSlots);
-    System.out.println("Pushable blocks: " + blocksToMove.stream().map(BlockPos::toShortString).toList());
+    // Push is valid
     return blocksToMove;
 }
+
 }

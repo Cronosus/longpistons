@@ -148,33 +148,43 @@ public class LongPistonBlock extends Block implements EntityBlock {
         }
     }
 */    
-private void moveBlocks(Level level, List<BlockPos> blocksToMove, Direction dir, BlockPos pistonBase, boolean extending) {
-    Collections.reverse(blocksToMove); // Move farthest blocks first 
-    if (extending) {
-        // From farthest to nearest
-        for (int i = blocksToMove.size() - 1; i >= 0; i--) {
-            BlockPos from = blocksToMove.get(i);
-            BlockPos to = from.relative(dir);
 
+private void moveBlocks(Level level, List<BlockPos> blocksToMove, Direction dir, BlockPos pistonBase, boolean extending) {
+    if (extending) {
+        Collections.reverse(blocksToMove); // Move farthest blocks first 
+        // From farthest to nearest
+        for (BlockPos from : blocksToMove) {
+            BlockPos to = from.relative(dir);
             BlockState moved = level.getBlockState(from);
+            PushReaction reaction = moved.getPistonPushReaction();
+
+            if (reaction == PushReaction.BLOCK) {
+                continue; // Cannot move
+            } else if (reaction == PushReaction.DESTROY) {
+                level.destroyBlock(from, true);
+                continue;
+            }
             if (!moved.isAir() && !moved.is(LongPistons.LONG_MOVING_PISTON.get())) {
                 BlockState movingState = LongPistons.LONG_MOVING_PISTON.get()
                     .defaultBlockState()
                     .setValue(LongMovingPistonBlock.FACING, dir);
                 level.setBlock(to, movingState, 3);
 
+                int distance = pistonBase.distManhattan(from);
                 BlockEntity be = LongPistonMovingBlockEntity.newMovingBlockEntity(
-                    to, moved, dir, true, false, 0, this.isSticky
+                    to, movingState, moved, dir, true, distance, this.isSticky
                 );
+/*                BlockEntity be = LongPistonMovingBlockEntity.newMovingBlockEntity(
+                    to, moved, true, dir, true, 0, this.isSticky
+                );*/
                 level.setBlockEntity(be);
                 level.removeBlock(from, false);
             }
         }
     } else {
-        // Retraction logic (optional)
+        // Retraction logic
         for (BlockPos from : blocksToMove) {
             BlockPos to = from.relative(dir.getOpposite());
-
             BlockState moved = level.getBlockState(from);
             if (!moved.isAir() && !moved.is(LongPistons.LONG_MOVING_PISTON.get())) {
                 BlockState movingState = LongPistons.LONG_MOVING_PISTON.get()
@@ -182,9 +192,13 @@ private void moveBlocks(Level level, List<BlockPos> blocksToMove, Direction dir,
                     .setValue(LongMovingPistonBlock.FACING, dir.getOpposite());
                 level.setBlock(to, movingState, 3);
 
+                int distance = pistonBase.distManhattan(from);
                 BlockEntity be = LongPistonMovingBlockEntity.newMovingBlockEntity(
-                    to, moved, dir.getOpposite(), false, false, 0, this.isSticky
+                    to, movingState, moved, dir.getOpposite(), false, distance, this.isSticky
                 );
+/*                BlockEntity be = LongPistonMovingBlockEntity.newMovingBlockEntity(
+                    to, moved, false, dir.getOpposite(), false, 0, this.isSticky
+                );*/
                 level.setBlockEntity(be);
                 level.removeBlock(from, false);
             }
@@ -277,8 +291,10 @@ private void moveBlocks(Level level, List<BlockPos> blocksToMove, Direction dir,
 private boolean tryExtend(Level level, BlockPos pos, Direction dir) {
     List<BlockPos> blocksToMove = LongPistonResolver.resolvePush(level, pos, dir, extensionLength);
 
-    // Allow extension even when no blocks are pushed
-    if (blocksToMove != null && !blocksToMove.isEmpty()) {
+    if (blocksToMove == null) {
+        return false; // Blocked: do not extend!
+    }
+    if (!blocksToMove.isEmpty()) {
         moveBlocks(level, blocksToMove, dir, pos, true);
     }
 
@@ -288,7 +304,7 @@ private boolean tryExtend(Level level, BlockPos pos, Direction dir) {
 //}
 
 // Move all blocks forward
-for (int i = blocksToMove.size() - 1; i >= 0; i--) {
+/*for (int i = blocksToMove.size() - 1; i >= 0; i--) {
     BlockPos fromPos = blocksToMove.get(i);
     BlockState moveState = level.getBlockState(fromPos);
     BlockPos toPos = fromPos.relative(dir);
@@ -296,12 +312,12 @@ for (int i = blocksToMove.size() - 1; i >= 0; i--) {
     // Replace with moving block
     level.setBlock(toPos, LongPistons.LONG_MOVING_PISTON.get().defaultBlockState(), 66);
     BlockEntity be = LongPistonMovingBlockEntity.newMovingBlockEntity(
-    toPos, moveState, dir, true, false, 0, this.isSticky
+    toPos, moveState, true, dir, true, 0, this.isSticky
     );
     level.setBlockEntity(be);
 
     level.removeBlock(fromPos, false);
-}
+}*/
 
     // Place piston arms in between base and head
     for (int i = 1; i < extensionLength; i++) {
